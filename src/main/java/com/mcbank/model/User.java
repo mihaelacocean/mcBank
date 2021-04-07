@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -13,13 +13,15 @@ import javax.persistence.Table;
 @Table(name="users")
 public class User {
 
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   private String name;
   private String surname;
   private double balance;
+
+  @OneToMany
+  private List<Account> accounts;
 
   public Long getId() {
     return id;
@@ -51,5 +53,13 @@ public class User {
 
   public void setBalance(double balance) {
     this.balance = balance;
+  }
+
+  public List<Account> getAccounts() {
+    return accounts;
+  }
+
+  public void setAccounts(List<Account> accounts) {
+    this.accounts = accounts;
   }
 }
