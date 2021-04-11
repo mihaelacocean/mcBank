@@ -1,6 +1,7 @@
 package com.mcbank.model;
 
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,16 +13,18 @@ public class Transaction {
 
   @Id
   @GeneratedValue
-  private long id;
+  private Long id;
   private double amount;
   private Date transactionDate;
   private TransactionType type;
+  @Column(name="account_id")
+ private Long accountId;
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -47,5 +50,13 @@ public class Transaction {
 
   public void setType(TransactionType type) {
     this.type = type;
+  }
+
+  public Long getAccountId() {
+    return accountId;
+  }
+
+  public void setAccountId(Long accountId) {
+    this.accountId = accountId;
   }
 }

@@ -1,7 +1,10 @@
 package com.mcbank.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,20 +18,26 @@ public class Account {
 
   @Id
   @GeneratedValue
-  private long id;
+  private Long id;
   private double amount;
   private Date creationDate;
   private AccountType type;
+  @Column(name="user_id")
+  private Long userId;
 
-  @OneToMany
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "accountId"
+  )
   private List<Transaction> transactions;
 
-  public long getId() {
-    return id;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public void setId(long id) {
-    this.id = id;
+  public Long getId() {
+    return id;
   }
 
   public double getAmount() {
@@ -40,7 +49,8 @@ public class Account {
   }
 
   public List<Transaction> getTransactions() {
-    return transactions;
+
+    return transactions == null ? new ArrayList<>() : transactions;
   }
 
   public void setTransactions(List<Transaction> transactions) {
@@ -61,5 +71,13 @@ public class Account {
 
   public void setType(AccountType type) {
     this.type = type;
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 }

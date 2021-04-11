@@ -1,26 +1,32 @@
 package com.mcbank.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue
   private Long id;
   private String name;
   private String surname;
   private double balance;
 
-  @OneToMany
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "userId"
+  )
   private List<Account> accounts;
 
   public Long getId() {
@@ -56,7 +62,7 @@ public class User {
   }
 
   public List<Account> getAccounts() {
-    return accounts;
+    return accounts == null ? new ArrayList<>() : accounts;
   }
 
   public void setAccounts(List<Account> accounts) {
