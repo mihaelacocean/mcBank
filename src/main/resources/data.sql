@@ -12,8 +12,7 @@ drop table if exists accounts_transactions;
 CREATE TABLE users (
   id BIGINT IDENTITY(1,1) PRIMARY KEY,
   name VARCHAR(250),
-  surname VARCHAR(250),
-  balance DOUBLE );
+  surname VARCHAR(250) );
 
 
 
@@ -32,10 +31,10 @@ CREATE TABLE transactions (
  account_id BIGINT);
 
 
-insert into users (id, name, surname, balance) values (1, 'Mihaela', 'Cocean', 13342.6);
-insert into users (id, name, surname, balance) values (2, 'John', 'John', 1245.0);
-insert into users (id, name, surname, balance) values (3, 'Mary', 'Sullivan', 344);
-insert into users (id, name, surname, balance) values (4, 'Lisa', 'Sullivan', 100);
+insert into users (id, name, surname) values (1, 'Mihaela', 'Cocean');
+insert into users (id, name, surname) values (2, 'John', 'John');
+insert into users (id, name, surname) values (3, 'Mary', 'Sullivan');
+insert into users (id, name, surname) values (4, 'Lisa', 'Sullivan');
 
 
 INSERT INTO accounts(id, amount, creation_date, type, user_id) values (1, 345, now(), 1,1);

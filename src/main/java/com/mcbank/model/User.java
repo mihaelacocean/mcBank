@@ -20,6 +20,7 @@ public class User {
   private Long id;
   private String name;
   private String surname;
+  @Transient
   private double balance;
 
   @OneToMany(
@@ -62,7 +63,10 @@ public class User {
   }
 
   public List<Account> getAccounts() {
-    return accounts == null ? new ArrayList<>() : accounts;
+    if (accounts == null) {
+      accounts = new ArrayList<>();
+    }
+    return accounts;
   }
 
   public void setAccounts(List<Account> accounts) {

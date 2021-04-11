@@ -49,8 +49,10 @@ public class Account {
   }
 
   public List<Transaction> getTransactions() {
-
-    return transactions == null ? new ArrayList<>() : transactions;
+    if (transactions == null) {
+      transactions = new ArrayList<>();
+    }
+    return transactions;
   }
 
   public void setTransactions(List<Transaction> transactions) {
