@@ -1,8 +1,18 @@
 package com.mcbank.controller;
 
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+import com.mcbank.model.Account;
 import com.mcbank.model.User;
+import com.mcbank.service.AccountService;
+import com.mcbank.service.TransactionService;
 import com.mcbank.service.UserService;
+import com.mcbank.service.exception.ValidationException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
@@ -27,6 +37,33 @@ public class UserControllerTest {
   @MockBean
   private UserService userService;
 
+  @MockBean
+  private AccountService accountService;
+
+  @MockBean
+  private TransactionService transactionService;
+
+
+  @Before
+  public void mockServices() throws  Exception {
+    when(userService.getById(anyLong())).thenReturn(getMockedUser(1l));
+    when(accountService.openCurrentAccount(anyLong(), anyDouble()))
+        .thenReturn(getMockedAccount(1L));
+    when(userService.userExists(Mockito.anyLong())).thenReturn(true);
+    doNothing().when(transactionService).doTransaction(anyLong(), anyDouble());
+  }
+
+
+  @Test
+  public void testCreateAccount() throws Exception {
+
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        "/accounts/6/").accept(
+        MediaType.APPLICATION_JSON);
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals("1", result.getResponse().getContentAsString());
+  }
 
   @Test
   public void test() throws Exception {
@@ -51,6 +88,13 @@ public class UserControllerTest {
     user.setSurname("Surname" + id);
     user.setId(id);
     return user;
+  }
+
+
+  private Account getMockedAccount( Long accountId) {
+    Account account = new Account();
+    account.setId(accountId);
+    return account;
   }
 
 }
