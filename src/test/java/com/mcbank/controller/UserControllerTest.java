@@ -50,7 +50,7 @@ public class UserControllerTest {
     when(accountService.openCurrentAccount(anyLong(), anyDouble()))
         .thenReturn(getMockedAccount(1L));
     when(userService.userExists(Mockito.anyLong())).thenReturn(true);
-    doNothing().when(transactionService).doTransaction(anyLong(), anyDouble());
+    doNothing().when(transactionService).addMoney(anyLong(), anyDouble());
   }
 
 

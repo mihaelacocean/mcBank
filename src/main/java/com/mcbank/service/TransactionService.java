@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface TransactionService {
 
-  void doTransaction(Long id, Double initialCredit);
+  void addMoney(Long id, Double initialCredit);
 }

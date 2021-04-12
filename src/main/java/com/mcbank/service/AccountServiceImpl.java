@@ -20,6 +20,9 @@ public class AccountServiceImpl implements AccountService {
     if (initialCredit < 0) {
       throw new ValidationException("Initial credit cannot be negative");
     }
+    if (userHasCurrentAccount(userId)) {
+      throw new ValidationException("Client already has a current account open");
+    }
     Account account = new Account();
     account.setUserId(userId);
     account.setType(AccountType.CURRENT_ACCOUNT);
@@ -27,4 +30,9 @@ public class AccountServiceImpl implements AccountService {
     account.setAmount(initialCredit);
     return accountRespository.save(account);
   }
+
+  private boolean userHasCurrentAccount(Long userId) {
+    return accountRespository.findByUserIdAndType(userId, AccountType.CURRENT_ACCOUNT).size() > 0;
+  }
+
 }

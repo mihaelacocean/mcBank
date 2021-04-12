@@ -14,7 +14,7 @@ public class TransactionServiceImpl implements TransactionService {
   TransactionRespository transactionRespository;
 
   @Override
-  public void doTransaction(Long accountId, Double initialCredit) {
+  public void addMoney(Long accountId, Double initialCredit) {
     Transaction transaction = new Transaction();
     transaction.setAmount(initialCredit);
     transaction.setAccountId(accountId);
