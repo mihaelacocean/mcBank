@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
     return user;
   }
 
+  @Override
+  public boolean userExists(Long id) {
+    return userRepository.existsById(id);
+  }
+
   void calculateFinalBalance(User user) {
     double balance = 0;
     for (Account account : user.getAccounts()) {
