@@ -58,15 +58,16 @@ public class UserControllerTest {
   public void testCreateAccount() throws Exception {
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
-        "/accounts/6/").accept(
-        MediaType.APPLICATION_JSON);
+        "/users/1/accounts/current").contentType(
+        MediaType.APPLICATION_JSON).content("34");
 
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(200, result.getResponse().getStatus());
     Assert.assertEquals("1", result.getResponse().getContentAsString());
   }
 
   @Test
-  public void test() throws Exception {
+  public void testGetUser() throws Exception {
 
     mockUserService(1L);
     RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
@@ -74,7 +75,8 @@ public class UserControllerTest {
         MediaType.APPLICATION_JSON);
 
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-    String expectedResult = "{\"id\":1,\"name\":\"Name1\",\"surname\":\"Surname1\",\"balance\":0.0,\"accounts\":null}";
+    String expectedResult = "{\"id\":1,\"name\":\"Name1\",\"surname\":\"Surname1\",\"balance\":0.0,\"accounts\":[]}";
+    Assert.assertEquals(200, result.getResponse().getStatus());
     Assert.assertEquals(expectedResult, result.getResponse().getContentAsString());
   }
 
