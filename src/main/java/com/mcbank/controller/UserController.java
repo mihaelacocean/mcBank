@@ -1,10 +1,12 @@
 package com.mcbank.controller;
 
+import com.mcbank.exception.InvalidRequestException;
 import com.mcbank.model.Account;
 import com.mcbank.model.User;
 import com.mcbank.service.AccountService;
 import com.mcbank.service.TransactionService;
 import com.mcbank.service.UserService;
+import com.mcbank.service.exception.ValidationException;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,18 +36,20 @@ public class UserController {
 
 
   @PostMapping("{costumerId}/accounts/current")
-  public long createAccount(@PathVariable("costumerId") Long costumerId, @RequestBody Double initialCredit)
-      throws Exception {
+  public long createAccount(@PathVariable("costumerId") Long costumerId, @RequestBody Double initialCredit) {
     if (!userService.userExists(costumerId)) {
-      throw new IllegalArgumentException("Customer ID doesn't exist");
+      throw new InvalidRequestException("Customer ID doesn't exist");
     }
-    Account createdAccount = openAccount(costumerId, initialCredit != null ? initialCredit : 0);
-    return createdAccount.getId();
-
+    try {
+      Account createdAccount = openAccount(costumerId, initialCredit != null ? initialCredit : 0);
+      return createdAccount.getId();
+    } catch ( ValidationException e) {
+      throw  new InvalidRequestException(e.getMessage());
+    }
   }
 
   @Transactional
-  Account openAccount(Long userId, Double initialCredit) throws Exception {
+  Account openAccount(Long userId, Double initialCredit) throws ValidationException {
     Account createdAccount = accountService.openCurrentAccount(userId, initialCredit);
     if(initialCredit != null && initialCredit > 0) {
       transactionService.addMoney(createdAccount.getId(), initialCredit);
