@@ -5,17 +5,19 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.mcbank.exception.AuthenticationException;
 import com.mcbank.model.Account;
 import com.mcbank.model.User;
 import com.mcbank.service.AccountService;
 import com.mcbank.service.TransactionService;
 import com.mcbank.service.UserService;
-import com.mcbank.service.exception.ValidationException;
+import com.mcbank.service.exception.UserNotFoundException;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,23 +45,19 @@ public class UserControllerTest {
   @MockBean
   private TransactionService transactionService;
 
-
-  @Before
-  public void mockServices() throws  Exception {
-    when(userService.getById(anyLong())).thenReturn(getMockedUser(1l));
-    when(accountService.openCurrentAccount(anyLong(), anyDouble()))
-        .thenReturn(getMockedAccount(1L));
-    when(userService.userExists(Mockito.anyLong())).thenReturn(true);
-    doNothing().when(transactionService).addMoney(anyLong(), anyDouble());
-  }
-
-
   @Test
   public void testCreateAccount() throws Exception {
 
+    when(accountService.openCurrentAccount(anyLong(), anyDouble()))
+        .thenReturn(getAccount(1L));
+    when(userService.userExists(Mockito.anyLong())).thenReturn(true);
+    doNothing().when(transactionService).addMoney(anyLong(), anyDouble());
+    when(userService.authenticateUser("authorized")).thenReturn(getAdmin());
+
     RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
         "/users/1/accounts/current").contentType(
-        MediaType.APPLICATION_JSON).content("34");
+        MediaType.APPLICATION_JSON).header("Authorization", "authorized").
+        content("34");
 
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     Assert.assertEquals(200, result.getResponse().getStatus());
@@ -67,12 +65,37 @@ public class UserControllerTest {
   }
 
   @Test
-  public void testGetUser() throws Exception {
+  public void testCreateAccountNotAuthenticated() throws Exception {
+    when(userService.authenticateUser("notAuthenticated"))
+        .thenThrow(new AuthenticationException("Invalid user"));
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        "/users/1/accounts/current").contentType(
+        MediaType.APPLICATION_JSON).header("Authorization", "notAuthenticated").
+        content("34");
 
-    mockUserService(1L);
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(401, result.getResponse().getStatus());
+  }
+
+  @Test
+  public void testCreateAccountNotAuthorized() throws Exception {
+    when(userService.authenticateUser("authenticated")).thenReturn(getUser(1L));
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        "/users/1/accounts/current").contentType(
+        MediaType.APPLICATION_JSON).header("Authorization", "authenticated").
+        content("34");
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(403, result.getResponse().getStatus());
+  }
+
+  @Test
+  public void testGetUser() throws Exception {
+    when(userService.authenticateUser("authenticated")).thenReturn(getUser(1L));
+    Mockito.when(userService.getById(1L)).thenReturn(getUser(1L));
     RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
         "/users/1").accept(
-        MediaType.APPLICATION_JSON);
+        MediaType.APPLICATION_JSON).header("Authorization", "authenticated");
 
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     String expectedResult = "{\"id\":1,\"name\":\"Name1\",\"surname\":\"Surname1\",\"balance\":0.0,\"accounts\":[]}";
@@ -80,11 +103,59 @@ public class UserControllerTest {
     Assert.assertEquals(expectedResult, result.getResponse().getContentAsString());
   }
 
-  private void mockUserService(Long id) {
-    Mockito.when(userService.getById(id)).thenReturn(getMockedUser(id));
+  @Test
+  public void testGetUserAdmin() throws Exception {
+
+    Mockito.when(userService.getById(1L)).thenReturn(getUser(1L));
+    when(userService.authenticateUser("authorized")).thenReturn(getAdmin());
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+        "/users/1").accept(
+        MediaType.APPLICATION_JSON).header("Authorization", "authorized");
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    String expectedResult = "{\"id\":1,\"name\":\"Name1\",\"surname\":\"Surname1\",\"balance\":0.0,\"accounts\":[]}";
+    Assert.assertEquals(200, result.getResponse().getStatus());
+    Assert.assertEquals(expectedResult, result.getResponse().getContentAsString());
   }
 
-  private User getMockedUser(Long id) {
+  @Test
+  public void testGetUserInvalidUserId() throws Exception {
+    when(userService.authenticateUser("authenticated")).thenReturn(getUser(1L));
+    Mockito.when(userService.getById(1L)).thenReturn(getUser(1L));
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+        "/users/2").accept(
+        MediaType.APPLICATION_JSON).header("Authorization", "authenticated");
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(403, result.getResponse().getStatus());
+  }
+
+  @Test
+  public void testLogin() throws Exception {
+
+    when(userService.login(Mockito.any())).thenReturn("authorized");
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        "/users/login").contentType(
+        MediaType.APPLICATION_JSON).content("{\"username\":\"admin\", \"password\": \"admin\"}");
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(200, result.getResponse().getStatus());
+    Assert.assertEquals("authorized", result.getResponse().getContentAsString());
+  }
+
+  @Test
+  public void testLoginInvalidUser() throws Exception {
+
+    when(userService.login(Mockito.any())).thenThrow(new UserNotFoundException());
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        "/users/login").contentType(
+        MediaType.APPLICATION_JSON).content("{\"username\":\"admin\", \"password\": \"admin\"}");
+
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    Assert.assertEquals(401, result.getResponse().getStatus());
+  }
+
+  private User getUser(Long id) {
     User user = new User();
     user.setName("Name" + id);
     user.setSurname("Surname" + id);
@@ -92,11 +163,17 @@ public class UserControllerTest {
     return user;
   }
 
-
-  private Account getMockedAccount( Long accountId) {
+  private Account getAccount(Long accountId) {
     Account account = new Account();
     account.setId(accountId);
     return account;
+  }
+
+  private User getAdmin() {
+    User user = new User();
+    user.setId(111L);
+    user.setAdmin(true);
+    return user;
   }
 
 }

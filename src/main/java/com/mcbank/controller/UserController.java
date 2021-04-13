@@ -1,5 +1,6 @@
 package com.mcbank.controller;
 
+import com.mcbank.exception.AuthenticationException;
 import com.mcbank.exception.AuthorizationException;
 import com.mcbank.exception.InvalidRequestException;
 import com.mcbank.model.Account;
@@ -66,7 +67,7 @@ public class UserController {
     try {
       return userService.login(credentials);
     } catch (UserNotFoundException e) {
-      throw new AuthorizationException(e.getMessage());
+     throw new AuthenticationException(e.getMessage());
     }
   }
 
