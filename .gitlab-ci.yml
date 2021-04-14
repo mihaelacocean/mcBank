@@ -1,17 +1,14 @@
-- name: Trigger GitLab CI
-  uses: appleboy/gitlab-ci-action@0.0.1
+name: trigger gitlab job
+on: [push]
+jobs:
 
-services:
-- docker:19.03.7-dind
-stages:
-  - build jar
-
-build:
-
-  image: maven:3.5.2-jdk-8-alpine
-  stage: build jar
-  script:
-    - mvn clean install
-  artifacts:
-    paths:
-      - target/*.jargit s
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: trigger Job
+        uses: appleboy/gitlab-ci-action@master
+        with:
+          url: "http://example.com"
+          token: ${{ secrets.TOKEN }}
+          project_id: 100
