@@ -1,3 +1,4 @@
+#gitlab pipeline trigger
 name: trigger gitlab job
 on: [push]
 jobs:
