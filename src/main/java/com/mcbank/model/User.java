@@ -1,5 +1,6 @@
 package com.mcbank.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -30,6 +31,11 @@ public class User {
       mappedBy = "userId"
   )
   private List<Account> accounts;
+
+  private boolean isAdmin;
+  private String authorization;
+  private String username;
+  private String password;
 
   public Long getId() {
     return id;
@@ -72,5 +78,23 @@ public class User {
 
   public void setAccounts(List<Account> accounts) {
     this.accounts = accounts;
+  }
+
+  @JsonIgnore
+  public boolean isAdmin() {
+    return isAdmin;
+  }
+
+  @JsonIgnore
+  public String getAuthorization() {
+    return authorization;
+  }
+
+  public void setAdmin(boolean isAdmin) {
+    this.isAdmin = isAdmin;
+  }
+
+  public void setAuthorization(String authorization) {
+    this.authorization = authorization;
   }
 }
