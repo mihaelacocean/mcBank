@@ -93,4 +93,8 @@ public class User {
   public void setAdmin(boolean isAdmin) {
     this.isAdmin = isAdmin;
   }
+
+  public void setAuthorization(String authorization) {
+    this.authorization = authorization;
+  }
 }
