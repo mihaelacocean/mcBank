@@ -18,10 +18,10 @@ public class UserServiceImpl implements UserService {
   UserRepository userRepository;
 
   @Override
-  public User getById(Long id) {
+  public User getById(Long id) throws UserNotFoundException {
 
     User user = Optional.ofNullable(userRepository.findById(id)).get()
-        .orElseThrow(() -> new IllegalArgumentException());
+        .orElseThrow(() -> new UserNotFoundException("User ID not found"));
     calculateFinalBalance(user);
     return user;
   }

@@ -33,7 +33,7 @@ public class UserServiceTest {
   public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
-  public void testCalculateUserBalance() {
+  public void testCalculateUserBalance() throws UserNotFoundException {
     Mockito.when(userRepository.findById(1L)).thenReturn(mockUser(1L));
     User user = userService.getById(1L);
     Assert.assertEquals(132.5, user.getBalance(), 2);

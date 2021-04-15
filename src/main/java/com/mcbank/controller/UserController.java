@@ -3,6 +3,7 @@ package com.mcbank.controller;
 import com.mcbank.exception.AuthenticationException;
 import com.mcbank.exception.AuthorizationException;
 import com.mcbank.exception.InvalidRequestException;
+import com.mcbank.exception.ResourceNotFoundException;
 import com.mcbank.model.Account;
 import com.mcbank.model.Credentials;
 import com.mcbank.model.User;
@@ -45,7 +46,11 @@ public class UserController {
     if (!user.isAdmin() && !user.getId().equals(id)) {
       throw new AuthorizationException("Forbidden");
     }
-    return userService.getById(id);
+    try {
+      return userService.getById(id);
+    } catch (UserNotFoundException e) {
+      throw new ResourceNotFoundException(e.getMessage());
+    }
   }
 
   @ApiOperation(response = Long.class, responseReference = "authorization token for the logged in user", value = "Creates a new current account for an existing user. If initialCredit is valid, the amount is added in client's current account")

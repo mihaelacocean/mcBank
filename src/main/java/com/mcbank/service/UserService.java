@@ -6,7 +6,7 @@ import com.mcbank.service.exception.UserNotFoundException;
 
 public interface UserService {
 
-  User getById(Long id);
+  User getById(Long id) throws UserNotFoundException;
 
   boolean userExists(Long id);
 
