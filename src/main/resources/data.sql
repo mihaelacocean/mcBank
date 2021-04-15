@@ -52,16 +52,20 @@ values (5, 'Admin', 'Admin', true, 'admin', 'admin', 'owjdwkldfqj@6dm');
 
 
 INSERT INTO accounts(id, amount, creation_date, type, user_id)
-values (1, 345, now(), 1, 1);
+values (1, 345, now(), 0, 1);
 INSERT INTO accounts(id, amount, creation_date, type, user_id)
-values (2, 10, now(), 2, 1);
+values (2, 100, now(), 1, 1);
 INSERT INTO accounts(id, amount, creation_date, type, user_id)
-values (3, 34442, now(), 2, 2);
+values (3, 3442, now(), 0, 2);
 
 
 insert into transactions(id, amount, type, transaction_date, account_id)
-values (1, 20, 1, NOW(), 1);
+values (1, 565, 0, NOW(), 1);
 insert into transactions(id, amount, type, transaction_date, account_id)
-values (2, 200, 1, NOW(), 1);
+values (2, 20, 1, NOW(), 1);
 insert into transactions(id, amount, type, transaction_date, account_id)
-values (3, 34, 1, NOW(), 2);
+values (3, 200, 1, NOW(), 1);
+insert into transactions(id, amount, type, transaction_date, account_id)
+values (4, 100, 0, NOW(), 2);
+insert into transactions(id, amount, type, transaction_date, account_id)
+values (5, 3442, 0, NOW(), 3);
